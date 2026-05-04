@@ -351,7 +351,6 @@ function exportKML() {
   adjusted.forEach((r, i) => {
     const coords = generateCircleCoords(lat, lng, r, 72);
     const h = data.hex[i];
-    const kmlColor = `${alphas[i]}${h.slice(4,6)}${h.slice(2,4)}${h.slice(0,2)}`;
     const lineColor = `ff${h.slice(4,6)}${h.slice(2,4)}${h.slice(0,2)}`;
     placemarks += `
   <Placemark>
@@ -359,7 +358,7 @@ function exportKML() {
     <description>ISRID ${data.probs[i]}% probability ring. ${r} km radius. Subject: ${data.label}.</description>
     <Style>
       <LineStyle><color>${lineColor}</color><width>2</width></LineStyle>
-      <PolyStyle><color>${kmlColor}</color></PolyStyle>
+      <PolyStyle><color>00000000</color><fill>0</fill></PolyStyle>
     </Style>
     <Polygon><outerBoundaryIs><LinearRing><coordinates>${coords}</coordinates></LinearRing></outerBoundaryIs></Polygon>
   </Placemark>`;
