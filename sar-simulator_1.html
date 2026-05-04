@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAR Probability Ring Simulator</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; padding: 1.5rem 1rem; }
+    .container { max-width: 860px; margin: 0 auto; }
+    header { margin-bottom: 1.25rem; }
+    header h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+    header p { font-size: 13px; color: #666; line-height: 1.6; }
+    .card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+    .card-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 1rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-bottom: 0.5rem; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; font-weight: 500; color: #666; text-transform: uppercase; letter-spacing: 0.08em; }
+    select, input[type="number"], input[type="text"] { padding: 8px 10px; border: 0.5px solid rgba(0,0,0,0.18); border-radius: 8px; font-size: 14px; background: #fff; color: #1a1a1a; outline: none; width: 100%; height: 36px; }
+    select:focus, input:focus { border-color: #185FA5; box-shadow: 0 0 0 3px rgba(24,95,165,0.1); }
+    .location-row { display: flex; gap: 8px; margin-bottom: 0.75rem; }
+    .location-row input { flex: 1; }
+    .btn-search { padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #1a1a1a; color: #fff; white-space: nowrap; height: 36px; transition: background 0.12s; }
+    .btn-search:hover { background: #333; }
+    .location-hint { font-size: 12px; color: #888; margin-bottom: 10px; }
+    .location-error { font-size: 12px; color: #A32D2D; margin-top: 6px; display: none; }
+    .map-hint { font-size: 12px; color: #888; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .map-hint::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #E24B4A; flex-shrink: 0; }
+    #map { width: 100%; height: 440px; border-radius: 10px; border: 0.5px solid rgba(0,0,0,0.1); }
+    .basemap-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .basemap-btn { padding: 6px 14px; font-size: 12px; border: 0.5px solid rgba(0,0,0,0.18); border-radius: 99px; background: #fff; cursor: pointer; color: #444; transition: background 0.12s; }
+    .basemap-btn:hover { background: #f0f0f0; }
+    .basemap-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .lkp-display { font-size: 12px; color: #555; margin-top: 10px; padding: 8px 12px; background: #f8f8f5; border-radius: 8px; }
+    .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; opacity: 0.8; }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1rem; }
+    .ring-card { background: #f8f8f5; border-radius: 8px; padding: 0.75rem 1rem; border-left: 3px solid #ccc; }
+    .ring-label { font-size: 11px; font-weight: 500; color: #666; margin-bottom: 3px; }
+    .ring-dist { font-size: 22px; font-weight: 500; color: #1a1a1a; }
+    .ring-unit { font-size: 12px; color: #888; }
+    .ring-prob { font-size: 12px; color: #888; margin-top: 2px; }
+    .note-box { background: #f8f8f5; border-radius: 8px; padding: 0.85rem 1rem; font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 1rem; }
+    .behavior-box { background: #f8f8f5; border-radius: 8px; padding: 0.85rem 1rem; font-size: 13px; color: #555; line-height: 1.9; }
+    .behavior-title { font-size: 13px; font-weight: 500; color: #1a1a1a; margin-bottom: 6px; }
+    .export-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0.5rem; }
+    .btn-export { flex: 1; min-width: 160px; padding: 11px 16px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #fff; color: #1a1a1a; transition: background 0.12s; text-align: center; }
+    .btn-export:hover { background: #f0f0f0; }
+    .btn-export.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .btn-export.primary:hover { background: #333; }
+    .export-note { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.6; }
+    .isrid-credit { font-size: 11px; color: #aaa; text-align: center; margin-top: 1rem; padding-top: 0.75rem; border-top: 0.5px solid rgba(0,0,0,0.08); }
+    .spinner { display: none; font-size: 12px; color: #888; margin-top: 6px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>SAR Probability Ring Simulator</h1>
+    <p>Enter a location to set the Last Known Point, adjust subject parameters, and generate ISRID-based probability rings. Export directly to CalTopo. Developed for GIS &amp; Emergency Management research — Western Carolina University.</p>
+  </header>
+
+  <div class="card">
+    <div class="card-title">Last known point (LKP) location</div>
+    <div class="location-hint">Enter an address, place name, or latitude/longitude (e.g. "35.3079, -83.1776") — or click the map directly</div>
+    <div class="location-row">
+      <input type="text" id="locationInput" placeholder="e.g. Cullowhee NC, or 35.3079, -83.1776" value="Cullowhee, NC"/>
+      <button class="btn-search" onclick="searchLocation()">Set LKP</button>
+    </div>
+    <div class="spinner" id="searchSpinner">Searching...</div>
+    <div class="location-error" id="locationError">Location not found. Try a different address or enter lat/long coordinates directly.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Subject parameters</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Subject type</label>
+        <select id="subjectType" onchange="updateRings()">
+          <option value="dementia">Dementia patient</option>
+          <option value="hiker">Hiker</option>
+          <option value="child">Lost child (6–12)</option>
+          <option value="despondent">Despondent adult</option>
+          <option value="mental">Mental illness</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Subject age</label>
+        <input type="number" id="age" value="78" min="1" max="100" oninput="updateRings()"/>
+      </div>
+      <div class="field">
+        <label>Terrain type</label>
+        <select id="terrain" onchange="updateRings()">
+          <option value="mountain">Mountain / Appalachian</option>
+          <option value="forest">Dense forest</option>
+          <option value="urban">Urban / Suburban</option>
+          <option value="flat">Flat / Rural</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Hours missing</label>
+        <input type="number" id="hours" value="4" min="1" max="72" oninput="updateRings()"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Map — click to adjust LKP or use the search above</div>
+    <div class="map-hint">You can also click directly on the map to move the LKP</div>
+    <div id="map"></div>
+    <div class="basemap-btns">
+      <button class="basemap-btn active" onclick="setBasemap('street',this)">Street</button>
+      <button class="basemap-btn" onclick="setBasemap('topo',this)">Topographic</button>
+      <button class="basemap-btn" onclick="setBasemap('satellite',this)">Satellite</button>
+    </div>
+    <div class="lkp-display" id="lkpDisplay">LKP: Cullowhee, NC (35.3079, -83.1776)</div>
+    <div class="legend" id="legendBox"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Ring distances — ISRID adjusted</div>
+    <div class="results-grid" id="resultsGrid"></div>
+    <div class="note-box" id="isridNote"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Export to CalTopo</div>
+    <div class="export-row">
+      <button class="btn-export primary" onclick="exportKML()">Download KML for CalTopo</button>
+      <button class="btn-export" onclick="exportGPX()">Download GPX</button>
+    </div>
+    <div class="export-note">
+      <strong>How to import into CalTopo:</strong> Download KML → open CalTopo → click <em>Add → Import File</em> → upload the file. Your LKP and all four probability rings will appear on your CalTopo map instantly.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Expected subject behaviors</div>
+    <div class="behavior-box" id="behaviorPanel"></div>
+    <div class="isrid-credit">Data: Koester, R.J. (2008). Lost Person Behavior. dbS Productions. ISRID — International Search &amp; Rescue Incident Database (150,000+ incidents).</div>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const ISRID = {
+  dementia:   { label:"Dementia patient",   rings:[0.5,1.5,3.0,5.0],   probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Dementia patients tend to follow linear features. ISRID data shows 50% found within 15m of a road or trail. Typically travel short distances but unpredictably.", behaviors:["Follows roads, trails, and streams","Attracted to light and noise sources","Avoids dense vegetation","May enter structures or vehicles","Unlikely to call for help","Often travels at night undetected"] },
+  hiker:      { label:"Hiker",              rings:[1.5,3.5,6.0,12.0],  probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Hikers travel significantly farther than other categories. ISRID data shows most remain on or near trail systems. Terrain channeling is a major factor in the Appalachians.", behaviors:["Stays on or near established trails","May attempt self-rescue navigation","Likely to signal for help","Travels further in open terrain","Usually found on or near high ground","Responds to searcher calls"] },
+  child:      { label:"Lost child (6–12)",  rings:[0.5,1.0,2.5,4.5],   probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Children typically travel short distances and seek shelter. ISRID shows most found in structures, dense vegetation, or near water features.", behaviors:["Seeks shelter and hiding spots","Attracted to water features","May not respond to searcher calls","Tends to travel downhill toward valleys","Often found very near last known point","May be frightened of searchers in uniform"] },
+  despondent: { label:"Despondent adult",   rings:[1.0,2.5,5.0,10.0],  probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Despondent subjects seek isolated locations deliberately. ISRID shows high association with terrain features like cliffs, water, and dense forest.", behaviors:["Seeks isolated, secluded areas deliberately","Actively avoids contact with others","May travel at night","Gravitates toward significant terrain features","Often found on forest edges or cliff areas","May disable or abandon mobile phone"] },
+  mental:     { label:"Mental illness",     rings:[0.8,2.0,4.0,8.0],   probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Subjects with mental illness show highly variable behavior. ISRID indicates unpredictable travel patterns but generally shorter distances than hikers.", behaviors:["Unpredictable travel patterns","May seek populated or familiar areas","Possible attraction to public transit","Variable response to searchers","Often found near major roads","May act purposefully despite disorientation"] }
+};
+
+const TERRAIN_MULTIPLIERS = { mountain:0.7, forest:0.8, urban:1.2, flat:1.1 };
+const TERRAIN_LABELS = {
+  mountain:"Mountain terrain reduces travel distance ~30% due to steep slopes and elevation gain common in the Appalachian range.",
+  forest:"Dense forest reduces travel distance ~20% due to navigation difficulty and physical obstruction.",
+  urban:"Urban terrain increases travel distance ~20% due to accessible road and sidewalk networks.",
+  flat:"Flat rural terrain increases travel distance ~10% due to ease of travel and open sightlines."
+};
+
+const DEFAULT_LKP = [35.3079, -83.1776];
+let currentLKP = [...DEFAULT_LKP];
+let currentLocationName = "Cullowhee, NC";
+let circles = [];
+let lkpMarker = null;
+let lastAdjusted = [];
+let lastData = null;
+
+const tileLayers = {
+  street:    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap contributors', maxZoom:19 }),
+  topo:      L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap contributors', maxZoom:17 }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'© Esri World Imagery', maxZoom:19 })
+};
+
+const map = L.map('map', { center: DEFAULT_LKP, zoom: 12, layers: [tileLayers.street] });
+
+const lkpIcon = L.divIcon({
+  className: '',
+  html: '<div style="width:16px;height:16px;border-radius:50%;background:#E24B4A;border:3px solid white;box-shadow:0 1px 5px rgba(0,0,0,0.4)"></div>',
+  iconSize: [16,16], iconAnchor: [8,8]
+});
+
+lkpMarker = L.marker(DEFAULT_LKP, { icon: lkpIcon, zIndexOffset: 1000 }).addTo(map);
+lkpMarker.bindTooltip('<strong>LKP</strong><br>Cullowhee, NC', { direction:'top', offset:[0,-10] });
+
+map.on('click', function(e) {
+  currentLKP = [e.latlng.lat, e.latlng.lng];
+  currentLocationName = `${currentLKP[0].toFixed(4)}, ${currentLKP[1].toFixed(4)}`;
+  lkpMarker.setLatLng(currentLKP);
+  lkpMarker.setTooltipContent(`<strong>LKP</strong><br>${currentLocationName}`);
+  updateDisplayAndRings();
+});
+
+function setBasemap(type, btn) {
+  Object.values(tileLayers).forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+  map.addLayer(tileLayers[type]);
+  document.querySelectorAll('.basemap-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+async function searchLocation() {
+  const input = document.getElementById('locationInput').value.trim();
+  if (!input) return;
+
+  const errorEl = document.getElementById('locationError');
+  const spinner = document.getElementById('searchSpinner');
+  errorEl.style.display = 'none';
+  spinner.style.display = 'block';
+
+  const latLngMatch = input.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+  if (latLngMatch) {
+    const lat = parseFloat(latLngMatch[1]);
+    const lng = parseFloat(latLngMatch[2]);
+    if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      spinner.style.display = 'none';
+      currentLKP = [lat, lng];
+      currentLocationName = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      moveToLocation(currentLKP, currentLocationName);
+      return;
+    }
+  }
+
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&limit=1`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const data = await res.json();
+    spinner.style.display = 'none';
+    if (data && data.length > 0) {
+      const lat = parseFloat(data[0].lat);
+      const lng = parseFloat(data[0].lon);
+      currentLocationName = data[0].display_name.split(',').slice(0,3).join(',');
+      currentLKP = [lat, lng];
+      moveToLocation(currentLKP, currentLocationName);
+    } else {
+      errorEl.style.display = 'block';
+    }
+  } catch(e) {
+    spinner.style.display = 'none';
+    errorEl.style.display = 'block';
+  }
+}
+
+function moveToLocation(latlng, name) {
+  lkpMarker.setLatLng(latlng);
+  lkpMarker.setTooltipContent(`<strong>LKP</strong><br>${name}`);
+  map.setView(latlng, 13);
+  updateDisplayAndRings();
+}
+
+function updateDisplayAndRings() {
+  document.getElementById('lkpDisplay').textContent =
+    `LKP: ${currentLocationName} (${currentLKP[0].toFixed(4)}, ${currentLKP[1].toFixed(4)})`;
+  updateRings();
+}
+
+function updateRings() {
+  const type = document.getElementById('subjectType').value;
+  const terrain = document.getElementById('terrain').value;
+  const hours = parseInt(document.getElementById('hours').value) || 4;
+  const data = ISRID[type];
+  const multiplier = TERRAIN_MULTIPLIERS[terrain];
+  const timeMultiplier = Math.min(1 + (hours - 4) * 0.05, 1.5);
+  const adjusted = data.rings.map(r => parseFloat((r * multiplier * timeMultiplier).toFixed(2)));
+  lastAdjusted = adjusted;
+  lastData = data;
+
+  circles.forEach(c => map.removeLayer(c));
+  circles = [];
+
+  for (let i = adjusted.length - 1; i >= 0; i--) {
+    const c = L.circle(currentLKP, {
+      radius: adjusted[i] * 1000,
+      color: data.colors[i],
+      fillColor: data.colors[i],
+      fillOpacity: 0,
+      weight: 2.5,
+      dashArray: i === adjusted.length - 1 ? '8,5' : null
+    }).addTo(map);
+    c.bindTooltip(`<strong>${data.probs[i]}% probability</strong><br>Within ${adjusted[i]} km of LKP`, { sticky:true });
+    circles.push(c);
+  }
+
+  const labels = ['Ring 1 — 25%','Ring 2 — 50%','Ring 3 — 75%','Ring 4 — 95%'];
+  document.getElementById('resultsGrid').innerHTML = adjusted.map((r,i) => `
+    <div class="ring-card" style="border-left-color:${data.colors[i]}">
+      <div class="ring-label">${labels[i]}</div>
+      <div class="ring-dist">${r} <span class="ring-unit">km</span></div>
+      <div class="ring-prob">${data.probs[i]}% of subjects found within</div>
+    </div>`).join('');
+
+  document.getElementById('isridNote').innerHTML =
+    `<strong>ISRID — ${data.label}:</strong> ${data.note}<br><br><em>Terrain adjustment: ${TERRAIN_LABELS[terrain]}</em>`;
+
+  document.getElementById('behaviorPanel').innerHTML =
+    `<div class="behavior-title">Expected behaviors — ${data.label}</div>` +
+    data.behaviors.map(b => `• ${b}`).join('<br>');
+
+  document.getElementById('legendBox').innerHTML = adjusted.map((r,i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${data.colors[i]}"></div>
+      ${data.probs[i]}% · ${r} km
+    </div>`).join('');
+}
+
+document.getElementById('locationInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') searchLocation();
+});
+
+function generateCircleCoords(lat, lng, radiusKm, points) {
+  const coords = [];
+  const R = 6371;
+  const d = radiusKm / R;
+  const latR = lat * Math.PI / 180;
+  const lngR = lng * Math.PI / 180;
+  for (let i = 0; i <= points; i++) {
+    const brng = (i * 360 / points) * Math.PI / 180;
+    const pLat = Math.asin(Math.sin(latR)*Math.cos(d)+Math.cos(latR)*Math.sin(d)*Math.cos(brng));
+    const pLng = lngR + Math.atan2(Math.sin(brng)*Math.sin(d)*Math.cos(latR), Math.cos(d)-Math.sin(latR)*Math.sin(pLat));
+    coords.push(`${(pLng*180/Math.PI).toFixed(6)},${(pLat*180/Math.PI).toFixed(6)},0`);
+  }
+  return coords.join(' ');
+}
+
+function exportKML() {
+  if (!lastData || lastAdjusted.length === 0) return;
+  const data = lastData;
+  const adjusted = lastAdjusted;
+  const lat = currentLKP[0];
+  const lng = currentLKP[1];
+  const type = document.getElementById('subjectType').value;
+  const hours = document.getElementById('hours').value;
+  const terrain = document.getElementById('terrain').value;
+  const now = new Date().toISOString().split('T')[0];
+  const ringNames = ['25% Probability Zone','50% Probability Zone','75% Probability Zone','95% Probability Zone (Outer Boundary)'];
+  const alphas = ['33','55','77','99'];
+
+  let placemarks = `
+  <Placemark>
+    <name>LKP — Last Known Point</name>
+    <description>Subject: ${data.label} | Location: ${currentLocationName} | Terrain: ${terrain} | Hours missing: ${hours} | Date: ${now}</description>
+    <Style><IconStyle><color>ff0000ff</color><scale>1.2</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon></IconStyle></Style>
+    <Point><coordinates>${lng.toFixed(6)},${lat.toFixed(6)},0</coordinates></Point>
+  </Placemark>`;
+
+  adjusted.forEach((r, i) => {
+    const coords = generateCircleCoords(lat, lng, r, 72);
+    const h = data.hex[i];
+    const kmlColor = `${alphas[i]}${h.slice(4,6)}${h.slice(2,4)}${h.slice(0,2)}`;
+    const lineColor = `ff${h.slice(4,6)}${h.slice(2,4)}${h.slice(0,2)}`;
+    placemarks += `
+  <Placemark>
+    <name>${ringNames[i]} — ${r} km</name>
+    <description>ISRID ${data.probs[i]}% probability ring. ${r} km radius. Subject: ${data.label}.</description>
+    <Style>
+      <LineStyle><color>${lineColor}</color><width>2</width></LineStyle>
+      <PolyStyle><color>${kmlColor}</color></PolyStyle>
+    </Style>
+    <Polygon><outerBoundaryIs><LinearRing><coordinates>${coords}</coordinates></LinearRing></outerBoundaryIs></Polygon>
+  </Placemark>`;
+  });
+
+  const kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+  <name>SAR Probability Rings — ${data.label} — ${now}</name>
+  <description>Generated by SAR Probability Ring Simulator. Subject: ${data.label}. Location: ${currentLocationName}. LKP: ${lat.toFixed(4)}, ${lng.toFixed(4)}. Source: ISRID / Koester (2008).</description>
+  ${placemarks}
+</Document>
+</kml>`;
+
+  downloadFile(kml, `SAR_Rings_${type}_${now}.kml`, 'application/vnd.google-earth.kml+xml');
+}
+
+function exportGPX() {
+  if (!lastData || lastAdjusted.length === 0) return;
+  const data = lastData;
+  const adjusted = lastAdjusted;
+  const lat = currentLKP[0];
+  const lng = currentLKP[1];
+  const type = document.getElementById('subjectType').value;
+  const now = new Date().toISOString().split('T')[0];
+
+  let waypoints = `  <wpt lat="${lat.toFixed(6)}" lon="${lng.toFixed(6)}">
+    <name>LKP</name>
+    <desc>Last Known Point — ${data.label} — ${currentLocationName}</desc>
+  </wpt>\n`;
+
+  let tracks = adjusted.map((r, i) => {
+    const coords = generateCircleCoords(lat, lng, r, 72);
+    const points = coords.trim().split(' ').map(c => {
+      const [lo, la] = c.split(',');
+      return `      <trkpt lat="${parseFloat(la).toFixed(6)}" lon="${parseFloat(lo).toFixed(6)}"></trkpt>`;
+    }).join('\n');
+    return `  <trk>
+    <name>${data.probs[i]}% Ring — ${r}km</name>
+    <trkseg>\n${points}\n    </trkseg>
+  </trk>`;
+  }).join('\n');
+
+  const gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="SAR Probability Ring Simulator — WCU EDM" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>SAR Rings — ${data.label} — ${now}</name>
+    <desc>ISRID probability rings. Subject: ${data.label}. LKP: ${lat.toFixed(4)}, ${lng.toFixed(4)}.</desc>
+  </metadata>
+${waypoints}${tracks}
+</gpx>`;
+
+  downloadFile(gpx, `SAR_Rings_${type}_${now}.gpx`, 'application/gpx+xml');
+}
+
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+updateRings();
+updateDisplayAndRings();
+</script>
+</body>
+</html>
