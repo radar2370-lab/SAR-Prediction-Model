@@ -117,7 +117,7 @@
       <button class="basemap-btn" onclick="setBasemap('topo',this)">Topographic</button>
       <button class="basemap-btn" onclick="setBasemap('satellite',this)">Satellite</button>
     </div>
-    <div class="lkp-display" id="lkpDisplay">LKP: Cullowhee, NC (35.3079, -83.1776)</div>
+    <div class="lkp-display" id="lkpDisplay">LKP: Youngsville, NC (36.021833246,-78.472998108) </div>
     <div class="legend" id="legendBox"></div>
   </div>
 
@@ -187,7 +187,7 @@ const lkpIcon = L.divIcon({
 });
 
 lkpMarker = L.marker(DEFAULT_LKP, { icon: lkpIcon, zIndexOffset: 1000 }).addTo(map);
-lkpMarker.bindTooltip('<strong>LKP</strong><br>Cullowhee, NC', { direction:'top', offset:[0,-10] });
+lkpMarker.bindTooltip('<strong>LKP</strong><br>Youngsville, NC', { direction:'top', offset:[0,-10] });
 
 map.on('click', function(e) {
   currentLKP = [e.latlng.lat, e.latlng.lng];
