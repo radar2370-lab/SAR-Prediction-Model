@@ -11,6 +11,7 @@
     .container { max-width: 860px; margin: 0 auto; }
     header { margin-bottom: 1.25rem; }
     header h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+    header h2 { font-size: 13px; font-weight: 400; color: #A32D2D; margin-bottom: 4px; }
     header p { font-size: 13px; color: #666; line-height: 1.6; }
     .card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
     .card-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 1rem; }
@@ -36,7 +37,7 @@
     .lkp-display { font-size: 12px; color: #555; margin-top: 10px; padding: 8px 12px; background: #f8f8f5; border-radius: 8px; }
     .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
     .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
-    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; opacity: 0.8; }
+    .legend-swatch { width: 28px; height: 4px; border-radius: 2px; flex-shrink: 0; }
     .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1rem; }
     .ring-card { background: #f8f8f5; border-radius: 8px; padding: 0.75rem 1rem; border-left: 3px solid #ccc; }
     .ring-label { font-size: 11px; font-weight: 500; color: #666; margin-bottom: 3px; }
@@ -46,19 +47,32 @@
     .note-box { background: #f8f8f5; border-radius: 8px; padding: 0.85rem 1rem; font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 1rem; }
     .behavior-box { background: #f8f8f5; border-radius: 8px; padding: 0.85rem 1rem; font-size: 13px; color: #555; line-height: 1.9; }
     .behavior-title { font-size: 13px; font-weight: 500; color: #1a1a1a; margin-bottom: 6px; }
-    .export-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0.5rem; }
+    .export-section { margin-bottom: 1rem; }
+    .export-section-title { font-size: 11px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .export-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
     .btn-export { flex: 1; min-width: 160px; padding: 11px 16px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #fff; color: #1a1a1a; transition: background 0.12s; text-align: center; }
     .btn-export:hover { background: #f0f0f0; }
     .btn-export.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
     .btn-export.primary:hover { background: #333; }
+    .btn-export.secondary { background: #185FA5; color: #fff; border-color: #185FA5; }
+    .btn-export.secondary:hover { background: #1450880; }
     .export-note { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.6; }
+    .sector-config { background: #f8f8f5; border-radius: 8px; padding: 1rem; margin-bottom: 10px; }
+    .sector-config-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 10px; }
+    .sector-config-row .field { min-width: 120px; flex: 1; }
+    .team-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-top: 8px; }
+    .team-input-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .team-input-wrap label { font-size: 11px; color: #666; }
+    .team-input-wrap input { height: 32px; font-size: 13px; }
     .isrid-credit { font-size: 11px; color: #aaa; text-align: center; margin-top: 1rem; padding-top: 0.75rem; border-top: 0.5px solid rgba(0,0,0,0.08); }
     .spinner { display: none; font-size: 12px; color: #888; margin-top: 6px; }
+    .optgroup-label { font-size: 11px; font-weight: 600; color: #888; }
     #autocompleteList { display: none; position: absolute; top: 38px; left: 0; right: 0; background: #fff; border: 0.5px solid rgba(0,0,0,0.18); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 9999; max-height: 240px; overflow-y: auto; }
     .autocomplete-item { padding: 10px 12px; font-size: 13px; color: #1a1a1a; cursor: pointer; border-bottom: 0.5px solid rgba(0,0,0,0.06); line-height: 1.4; }
     .autocomplete-item:last-child { border-bottom: none; }
     .autocomplete-item:hover, .autocomplete-item.active { background: #f0f4ff; }
     .autocomplete-sub { font-size: 11px; color: #888; margin-top: 2px; }
+    .divider { border: none; border-top: 0.5px solid rgba(0,0,0,0.08); margin: 1rem 0; }
   </style>
 </head>
 <body>
@@ -66,7 +80,7 @@
 
   <header>
     <h1>SAR Probability Ring Simulator</h1>
-    <h2>Please note! This is a beta program that is not intended for official use.</h2>
+    <h2>Beta — not intended for official use</h2>
     <p>Enter a location to set the Last Known Point, adjust subject parameters, and generate ISRID-based probability rings. Export directly to CalTopo.</p>
   </header>
 
@@ -81,7 +95,7 @@
       <button class="btn-search" onclick="searchLocation()">Set LKP</button>
     </div>
     <div class="spinner" id="searchSpinner">Searching...</div>
-    <div class="location-error" id="locationError">Location not found. Try a different address or enter lat/long coordinates directly.</div>
+    <div class="location-error" id="locationError">Location not found.</div>
   </div>
 
   <div class="card">
@@ -90,16 +104,36 @@
       <div class="field">
         <label>Subject type</label>
         <select id="subjectType" onchange="updateRings()">
-          <option value="dementia">Dementia patient</option>
-          <option value="hiker">Hiker</option>
-          <option value="child">Lost child (6-12)</option>
-          <option value="despondent">Despondent adult</option>
-          <option value="mental">Mental illness</option>
+          <optgroup label="── Cognitive / Medical ──">
+            <option value="dementia">Dementia / Alzheimer's</option>
+            <option value="autism">Autism spectrum</option>
+            <option value="mental">Mental illness</option>
+            <option value="intoxicated">Intoxicated adult</option>
+          </optgroup>
+          <optgroup label="── Age-based ──">
+            <option value="child_1_3">Lost child (1–3)</option>
+            <option value="child_4_6">Lost child (4–6)</option>
+            <option value="child_6_12">Lost child (6–12)</option>
+            <option value="child_13_15">Lost teen (13–15)</option>
+          </optgroup>
+          <optgroup label="── Outdoor / Activity ──">
+            <option value="hiker">Hiker</option>
+            <option value="hunter">Hunter</option>
+            <option value="climber">Climber / Mountaineer</option>
+            <option value="skier">Skier / Snowboarder</option>
+            <option value="atv">ATV / Dirt bike rider</option>
+            <option value="equestrian">Equestrian</option>
+          </optgroup>
+          <optgroup label="── Other ──">
+            <option value="despondent">Despondent adult</option>
+            <option value="elderly">Elderly (non-dementia)</option>
+            <option value="worker">Outdoor worker</option>
+          </optgroup>
         </select>
       </div>
       <div class="field">
         <label>Subject age</label>
-        <input type="number" id="age" value="78" min="1" max="100" oninput="updateRings()"/>
+        <input type="number" id="age" value="72" min="1" max="100" oninput="updateRings()"/>
       </div>
       <div class="field">
         <label>Terrain type</label>
@@ -118,7 +152,7 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Map - click to adjust LKP or use the search above</div>
+    <div class="card-title">Map — click to adjust LKP or use the search above</div>
     <div class="map-hint">You can also click directly on the map to move the LKP</div>
     <div id="map"></div>
     <div class="basemap-btns">
@@ -131,43 +165,94 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Ring distances - ISRID adjusted</div>
+    <div class="card-title">Ring distances — ISRID adjusted</div>
     <div class="results-grid" id="resultsGrid"></div>
     <div class="note-box" id="isridNote"></div>
   </div>
 
   <div class="card">
     <div class="card-title">Export to CalTopo</div>
-    <div class="export-row">
-      <button class="btn-export primary" onclick="exportKML()">Download KML for CalTopo</button>
-      <button class="btn-export" onclick="exportGPX()">Download GPX</button>
+
+    <div class="export-section">
+      <div class="export-section-title">Standard export</div>
+      <div class="export-row">
+        <button class="btn-export primary" onclick="exportKML()">Download KML (all rings)</button>
+        <button class="btn-export" onclick="exportKMLSeparate()">Download KML (one file per ring)</button>
+        <button class="btn-export" onclick="exportGPX()">Download GPX</button>
+      </div>
     </div>
+
+    <hr class="divider"/>
+
+    <div class="export-section">
+      <div class="export-section-title">Sector / Team assignment export</div>
+      <div class="sector-config">
+        <div class="sector-config-row">
+          <div class="field">
+            <label>Number of sectors</label>
+            <select id="sectorCount" onchange="updateTeamInputs()">
+              <option value="4">4 sectors</option>
+              <option value="6" selected>6 sectors</option>
+              <option value="8">8 sectors</option>
+              <option value="12">12 sectors</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Start bearing (°)</label>
+            <input type="number" id="sectorOffset" value="0" min="0" max="359"/>
+          </div>
+        </div>
+        <div class="export-section-title" style="margin-bottom:6px;">Team names (optional)</div>
+        <div class="team-inputs" id="teamInputs"></div>
+      </div>
+      <div class="export-row">
+        <button class="btn-export secondary" onclick="exportSectorKML()">Download Sector KML for CalTopo</button>
+      </div>
+    </div>
+
     <div class="export-note">
-      <strong>How to import into CalTopo:</strong> Download KML, open CalTopo, click <em>Add, Import File</em>, upload the file. Your LKP and all four probability rings will appear on your CalTopo map instantly.
+      <strong>How to import into CalTopo:</strong> Download KML → open CalTopo → click <em>Add → Import File</em> → upload the file.
     </div>
   </div>
 
   <div class="card">
     <div class="card-title">Expected subject behaviors</div>
     <div class="behavior-box" id="behaviorPanel"></div>
-    <div class="isrid-credit">Data: Koester, R.J. (2008). Lost Person Behavior. dbS Productions. ISRID - International Search &amp; Rescue Incident Database (150,000+ incidents).</div>
+    <div class="isrid-credit">Data: Koester, R.J. (2008). Lost Person Behavior. dbS Productions. ISRID — International Search &amp; Rescue Incident Database (150,000+ incidents).</div>
   </div>
 
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// ── ISRID Data (expanded) ─────────────────────────────────────
 const ISRID = {
-  dementia:   { label:"Dementia patient",   rings:[0.5,1.5,3.0,5.0],   probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Dementia patients tend to follow linear features. ISRID data shows 50% found within 15m of a road or trail. Typically travel short distances but unpredictably.", behaviors:["Follows roads, trails, and streams","Attracted to light and noise sources","Avoids dense vegetation","May enter structures or vehicles","Unlikely to call for help","Often travels at night undetected"] },
-  hiker:      { label:"Hiker",              rings:[1.5,3.5,6.0,12.0],  probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Hikers travel significantly farther than other categories. ISRID data shows most remain on or near trail systems. Terrain channeling is a major factor in the Appalachians.", behaviors:["Stays on or near established trails","May attempt self-rescue navigation","Likely to signal for help","Travels further in open terrain","Usually found on or near high ground","Responds to searcher calls"] },
-  child:      { label:"Lost child (6-12)",  rings:[0.5,1.0,2.5,4.5],   probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Children typically travel short distances and seek shelter. ISRID shows most found in structures, dense vegetation, or near water features.", behaviors:["Seeks shelter and hiding spots","Attracted to water features","May not respond to searcher calls","Tends to travel downhill toward valleys","Often found very near last known point","May be frightened of searchers in uniform"] },
-  despondent: { label:"Despondent adult",   rings:[1.0,2.5,5.0,10.0],  probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Despondent subjects seek isolated locations deliberately. ISRID shows high association with terrain features like cliffs, water, and dense forest.", behaviors:["Seeks isolated, secluded areas deliberately","Actively avoids contact with others","May travel at night","Gravitates toward significant terrain features","Often found on forest edges or cliff areas","May disable or abandon mobile phone"] },
-  mental:     { label:"Mental illness",     rings:[0.8,2.0,4.0,8.0],   probs:[25,50,75,95], colors:["#E24B4A","#EF9F27","#639922","#185FA5"], hex:["E24B4A","EF9F27","639922","185FA5"], note:"Subjects with mental illness show highly variable behavior. ISRID indicates unpredictable travel patterns but generally shorter distances than hikers.", behaviors:["Unpredictable travel patterns","May seek populated or familiar areas","Possible attraction to public transit","Variable response to searchers","Often found near major roads","May act purposefully despite disorientation"] }
+  dementia:    { label:"Dementia / Alzheimer's", rings:[0.5,1.5,3.0,5.0],   probs:[25,50,75,95], note:"Tend to follow linear features. 50% found within 15m of a road or trail. Short distances but unpredictable. Often travel at night.", behaviors:["Follows roads, trails, and streams","Attracted to light and noise","Avoids dense vegetation","May enter structures or vehicles","Unlikely to call for help","Often travels at night undetected","May remove clothing in cold (paradoxical undressing)"] },
+  autism:      { label:"Autism spectrum",        rings:[0.5,1.2,2.5,4.0],   probs:[25,50,75,95], note:"ISRID data shows autistic subjects tend to travel short distances but may fixate on specific destinations. Water is a major attraction and hazard. May not respond to name.", behaviors:["Attracted to water features — high drowning risk","May fixate on specific destination or object","Often found in small enclosed spaces","Unlikely to respond to name being called","May not perceive danger","Avoid bright lights and loud noises when searching","Often found within sight of LKP"] },
+  mental:      { label:"Mental illness",         rings:[0.8,2.0,4.0,8.0],   probs:[25,50,75,95], note:"Highly variable behavior. Unpredictable travel patterns but generally shorter distances than hikers.", behaviors:["Unpredictable travel patterns","May seek populated or familiar areas","Possible attraction to public transit","Variable response to searchers","Often found near major roads","May act purposefully despite disorientation"] },
+  intoxicated: { label:"Intoxicated adult",      rings:[0.5,1.0,2.5,4.5],   probs:[25,50,75,95], note:"Typically found close to last known point. High association with water features and terrain entrapment. Often found face-down.", behaviors:["Short travel distance from LKP","Attracted to or falls into water","May seek shelter in vehicles or structures","Often found in terrain traps (ditches, culverts)","May not respond to searchers","Hypothermia risk is high"] },
+  child_1_3:   { label:"Lost child (1–3)",       rings:[0.1,0.3,0.5,1.0],   probs:[25,50,75,95], note:"Very short distances. Usually found within sight of LKP. High association with water and small enclosed spaces.", behaviors:["Rarely travels more than 100m from LKP","Attracted to water","Often hides in small enclosed spaces","Will not typically respond to searchers","May fall asleep once stopped","Check nearby structures first"] },
+  child_4_6:   { label:"Lost child (4–6)",       rings:[0.2,0.5,1.0,2.0],   probs:[25,50,75,95], note:"Short distances. May hide when approached. Water remains a significant hazard.", behaviors:["Short distances from LKP","May hide when frightened or approached","Attracted to water","Check dense vegetation and structures","May respond to familiar names (pet, sibling)","Often found within sight of last known point"] },
+  child_6_12:  { label:"Lost child (6–12)",      rings:[0.5,1.0,2.5,4.5],   probs:[25,50,75,95], note:"ISRID shows most found in structures, dense vegetation, or near water. May be frightened of searchers in uniform.", behaviors:["Seeks shelter and hiding spots","Attracted to water features","May not respond to searcher calls","Tends to travel downhill toward valleys","Often found very near last known point","May be frightened of searchers in uniform"] },
+  child_13_15: { label:"Lost teen (13–15)",      rings:[1.0,2.5,5.0,9.0],   probs:[25,50,75,95], note:"Travel distances increase significantly with age. Teens may deliberately avoid searchers or attempt self-rescue.", behaviors:["May attempt self-rescue or navigate independently","Can travel significant distances","May avoid or hide from searchers","Likely to seek cell signal on high ground","May be embarrassed and reluctant to signal","Check roads and trailheads"] },
+  hiker:       { label:"Hiker",                  rings:[1.5,3.5,6.0,12.0],  probs:[25,50,75,95], note:"Travel significantly farther than other categories. Most remain on or near trail systems. Terrain channeling is a major factor in the Appalachians.", behaviors:["Stays on or near established trails","May attempt self-rescue navigation","Likely to signal for help","Travels further in open terrain","Usually found on or near high ground","Responds to searcher calls"] },
+  hunter:      { label:"Hunter",                 rings:[1.0,3.0,5.5,10.0],  probs:[25,50,75,95], note:"Hunters are often well-equipped and may attempt self-rescue. Typically found near game trails, water sources, and field edges.", behaviors:["Familiar with terrain — may attempt self-rescue","Often found near water sources and field edges","May have fired weapon as signal — check for heard shots","Typically has equipment and supplies","May travel off-trail","Check vehicle last location for clues"] },
+  climber:     { label:"Climber / Mountaineer",  rings:[1.0,2.5,5.0,10.0],  probs:[25,50,75,95], note:"Often found in vertical terrain. Injuries are common. May be unable to self-rescue even if conscious.", behaviors:["Focus search on cliff faces, gullies, and ridges","Injury or entrapment likely","May be visible from air","Likely experienced — may have left a trip plan","Check for rescue signals (mirror, whistle)","Vertical terrain requires technical rescue resources"] },
+  skier:       { label:"Skier / Snowboarder",    rings:[0.5,2.0,4.0,8.0],   probs:[25,50,75,95], note:"High risk of terrain entrapment, tree wells, and avalanche. Search terrain features first.", behaviors:["Check tree wells and terrain traps","Avalanche burial risk — use beacon search","May be injured from falls","Often found off-piste in steep terrain","Hypothermia risk is high","Night search critical — cold temperatures increase mortality risk"] },
+  atv:         { label:"ATV / Dirt bike rider",  rings:[2.0,5.0,10.0,20.0], probs:[25,50,75,95], note:"Cover the most ground of any category. Found near trails, roads, and terrain features. Injury or mechanical failure common cause.", behaviors:["Travels far from LKP — wide search area","Often found at end of trail or terrain feature","Mechanical failure common — check for abandoned vehicle","Injury from crash likely","May have traveled in a group — interview companions","Air search highly effective"] },
+  equestrian:  { label:"Equestrian",             rings:[2.0,5.0,9.0,16.0],  probs:[25,50,75,95], note:"Horse may return home without rider. Rider injuries from falls are common. Search along trails and equestrian paths.", behaviors:["Check if horse has returned to stable — common behavior","Rider injury from fall likely","Search along equestrian trails and open terrain","Subject may be immobile if injured","Horse may be found before rider","Air and horse-mounted search effective"] },
+  despondent:  { label:"Despondent adult",       rings:[1.0,2.5,5.0,10.0],  probs:[25,50,75,95], note:"Seek isolated locations deliberately. High association with terrain features like cliffs, water, and dense forest.", behaviors:["Seeks isolated, secluded areas deliberately","Actively avoids contact with others","May travel at night","Gravitates toward significant terrain features","Often found on forest edges or cliff areas","May disable or abandon mobile phone"] },
+  elderly:     { label:"Elderly (non-dementia)", rings:[0.3,1.0,2.0,4.0],   probs:[25,50,75,95], note:"Short travel distances. Injury risk is higher. Likely to seek shade or shelter and stop moving when tired.", behaviors:["Short distances from LKP","May sit down and be unable to continue","Injury or fall risk is elevated","Seeks shade and shelter","May not call for help if embarrassed","Check structures, porches, and benches"] },
+  worker:      { label:"Outdoor worker",         rings:[1.0,3.0,6.0,12.0],  probs:[25,50,75,95], note:"Familiar with terrain and typically has tools. Injury or medical emergency is often the cause. Search work area thoroughly.", behaviors:["Likely familiar with area","Injury or medical emergency probable","Search work site and surrounding terrain","May have tools that can be used as signals","Check vehicles and equipment at LKP","Interview coworkers about last known activity"] }
 };
+
+const RING_COLORS = ["#E24B4A","#EF9F27","#639922","#185FA5"];
+const RING_HEX    = ["E24B4A","EF9F27","639922","185FA5"];
+const RING_WIDTHS = [2, 2.5, 3, 3.5]; // progressively thicker per ring
 
 const TERRAIN_MULTIPLIERS = { mountain:0.7, forest:0.8, urban:1.2, flat:1.1 };
 const TERRAIN_LABELS = {
-  mountain:"Mountain terrain reduces travel distance ~30% due to steep slopes and elevation gain common in the Appalachian range.",
+  mountain:"Mountain terrain reduces travel distance ~30% due to steep slopes and elevation gain.",
   forest:"Dense forest reduces travel distance ~20% due to navigation difficulty and physical obstruction.",
   urban:"Urban terrain increases travel distance ~20% due to accessible road and sidewalk networks.",
   flat:"Flat rural terrain increases travel distance ~10% due to ease of travel and open sightlines."
@@ -189,9 +274,9 @@ let coordCache = {};
 let lastRingKey = null;
 
 const tileLayers = {
-  street:    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'OpenStreetMap contributors', maxZoom:19 }),
-  topo:      L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'OpenTopoMap contributors', maxZoom:17 }),
-  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'Esri World Imagery', maxZoom:19 })
+  street:    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap contributors', maxZoom:19 }),
+  topo:      L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution:'© OpenTopoMap contributors', maxZoom:17 }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'© Esri World Imagery', maxZoom:19 })
 };
 
 const map = L.map('map', { center: DEFAULT_LKP, zoom: 12, layers: [tileLayers.street] });
@@ -211,7 +296,7 @@ map.on('click', function(e) {
   lkpMarker.setLatLng(currentLKP);
   lkpMarker.setTooltipContent('<strong>LKP</strong><br>' + currentLocationName);
   closeAutocomplete();
-  coordCache = {};  // clear coord cache when LKP moves
+  coordCache = {};
   updateDisplayAndRings();
 });
 
@@ -222,7 +307,7 @@ function setBasemap(type, btn) {
   btn.classList.add('active');
 }
 
-// Autocomplete
+// ── Autocomplete ──────────────────────────────────────────────
 var locationInput = document.getElementById('locationInput');
 var autocompleteList = document.getElementById('autocompleteList');
 
@@ -231,29 +316,15 @@ locationInput.addEventListener('input', function() {
   clearTimeout(autocompleteTimer);
   if (val.length < 3) { closeAutocomplete(); return; }
   if (/^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/.test(val)) { closeAutocomplete(); return; }
-  autocompleteTimer = setTimeout(function() { fetchSuggestions(val); }, 300);
+  autocompleteTimer = setTimeout(function() { fetchSuggestions(val); }, 500);
 });
 
 locationInput.addEventListener('keydown', function(e) {
   var items = autocompleteList.querySelectorAll('.autocomplete-item');
-  if (e.key === 'ArrowDown') {
-    e.preventDefault();
-    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-    updateActiveItem(items);
-  } else if (e.key === 'ArrowUp') {
-    e.preventDefault();
-    selectedIndex = Math.max(selectedIndex - 1, -1);
-    updateActiveItem(items);
-  } else if (e.key === 'Enter') {
-    e.preventDefault();
-    if (selectedIndex >= 0 && autocompleteResults[selectedIndex]) {
-      selectSuggestion(autocompleteResults[selectedIndex]);
-    } else {
-      searchLocation();
-    }
-  } else if (e.key === 'Escape') {
-    closeAutocomplete();
-  }
+  if (e.key === 'ArrowDown') { e.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, items.length - 1); updateActiveItem(items); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, -1); updateActiveItem(items); }
+  else if (e.key === 'Enter') { e.preventDefault(); if (selectedIndex >= 0 && autocompleteResults[selectedIndex]) { selectSuggestion(autocompleteResults[selectedIndex]); } else { searchLocation(); } }
+  else if (e.key === 'Escape') { closeAutocomplete(); }
 });
 
 document.addEventListener('click', function(e) {
@@ -261,37 +332,18 @@ document.addEventListener('click', function(e) {
 });
 
 function updateActiveItem(items) {
-  items.forEach(function(item, i) {
-    item.classList.toggle('active', i === selectedIndex);
-  });
+  items.forEach(function(item, i) { item.classList.toggle('active', i === selectedIndex); });
 }
 
 function fetchSuggestions(query) {
-  // Return cached result instantly if we have it
-  if (searchCache[query]) {
-    autocompleteResults = searchCache[query];
-    selectedIndex = -1;
-    renderSuggestions(searchCache[query]);
-    return;
-  }
-  // Cancel any previous in-flight request
+  if (searchCache[query]) { autocompleteResults = searchCache[query]; selectedIndex = -1; renderSuggestions(searchCache[query]); return; }
   if (currentAbortController) currentAbortController.abort();
   currentAbortController = new AbortController();
   var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&limit=6&addressdetails=1';
-  fetch(url, {
-    headers: { 'Accept-Language': 'en', 'User-Agent': 'SAR-Probability-Ring-Simulator/1.0' },
-    signal: currentAbortController.signal
-  })
+  fetch(url, { headers: { 'Accept-Language': 'en', 'User-Agent': 'SAR-Probability-Ring-Simulator/1.0' }, signal: currentAbortController.signal })
     .then(function(res) { return res.json(); })
-    .then(function(data) {
-      searchCache[query] = data;  // cache for next time
-      autocompleteResults = data;
-      selectedIndex = -1;
-      renderSuggestions(data);
-    })
-    .catch(function(err) {
-      if (err.name !== 'AbortError') closeAutocomplete();
-    });
+    .then(function(data) { searchCache[query] = data; autocompleteResults = data; selectedIndex = -1; renderSuggestions(data); })
+    .catch(function(err) { if (err.name !== 'AbortError') closeAutocomplete(); });
 }
 
 function renderSuggestions(results) {
@@ -301,9 +353,7 @@ function renderSuggestions(results) {
     var main = parts.slice(0, 2).join(',').trim();
     var sub = parts.slice(2, 4).join(',').trim();
     return '<div class="autocomplete-item" onmousedown="selectSuggestion(autocompleteResults[' + i + '])">' +
-      '<div>' + main + '</div>' +
-      (sub ? '<div class="autocomplete-sub">' + sub + '</div>' : '') +
-      '</div>';
+      '<div>' + main + '</div>' + (sub ? '<div class="autocomplete-sub">' + sub + '</div>' : '') + '</div>';
   }).join('');
   autocompleteList.style.display = 'block';
 }
@@ -311,24 +361,18 @@ function renderSuggestions(results) {
 function selectSuggestion(result) {
   var lat = parseFloat(result.lat);
   var lng = parseFloat(result.lon);
-  var parts = result.display_name.split(',');
-  currentLocationName = parts.slice(0, 3).join(',').trim();
+  currentLocationName = result.display_name.split(',').slice(0, 3).join(',').trim();
   currentLKP = [lat, lng];
   locationInput.value = currentLocationName;
   closeAutocomplete();
   moveToLocation(currentLKP, currentLocationName);
 }
 
-function closeAutocomplete() {
-  autocompleteList.style.display = 'none';
-  autocompleteList.innerHTML = '';
-  selectedIndex = -1;
-}
+function closeAutocomplete() { autocompleteList.style.display = 'none'; autocompleteList.innerHTML = ''; selectedIndex = -1; }
 
 async function searchLocation() {
   var input = locationInput.value.trim();
   if (!input) return;
-
   var errorEl = document.getElementById('locationError');
   var spinner = document.getElementById('searchSpinner');
   errorEl.style.display = 'none';
@@ -337,41 +381,32 @@ async function searchLocation() {
 
   var latLngMatch = input.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
   if (latLngMatch) {
-    var lat = parseFloat(latLngMatch[1]);
-    var lng = parseFloat(latLngMatch[2]);
+    var lat = parseFloat(latLngMatch[1]), lng = parseFloat(latLngMatch[2]);
     if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
       spinner.style.display = 'none';
-      currentLKP = [lat, lng];
-      currentLocationName = lat.toFixed(4) + ', ' + lng.toFixed(4);
-      moveToLocation(currentLKP, currentLocationName);
-      return;
+      currentLKP = [lat, lng]; currentLocationName = lat.toFixed(4) + ', ' + lng.toFixed(4);
+      moveToLocation(currentLKP, currentLocationName); return;
     }
   }
 
-  // Check cache first
   var cacheKey = 'exact:' + input.toLowerCase();
   if (searchCache[cacheKey]) {
     spinner.style.display = 'none';
-    var cached = searchCache[cacheKey];
-    currentLKP = [cached.lat, cached.lng];
-    currentLocationName = cached.name;
-    moveToLocation(currentLKP, currentLocationName);
-    return;
+    var c = searchCache[cacheKey]; currentLKP = [c.lat, c.lng]; currentLocationName = c.name;
+    moveToLocation(currentLKP, currentLocationName); return;
   }
 
   try {
     var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(input) + '&limit=1';
     var res = await fetch(url, { headers: { 'Accept-Language': 'en', 'User-Agent': 'SAR-Probability-Ring-Simulator/1.0' } });
-    if (!res.ok) throw new Error('Service returned ' + res.status);
+    if (!res.ok) throw new Error('http ' + res.status);
     var data = await res.json();
     spinner.style.display = 'none';
     if (data && data.length > 0) {
-      var lat = parseFloat(data[0].lat);
-      var lng = parseFloat(data[0].lon);
-      var name = data[0].display_name.split(',').slice(0,3).join(',');
+      var lat = parseFloat(data[0].lat), lng = parseFloat(data[0].lon);
+      var name = data[0].display_name.split(',').slice(0, 3).join(',');
       searchCache[cacheKey] = { lat: lat, lng: lng, name: name };
-      currentLKP = [lat, lng];
-      currentLocationName = name;
+      currentLKP = [lat, lng]; currentLocationName = name;
       moveToLocation(currentLKP, currentLocationName);
     } else {
       errorEl.textContent = 'Location not found. Try a more specific address or enter lat/long directly.';
@@ -379,11 +414,7 @@ async function searchLocation() {
     }
   } catch(e) {
     spinner.style.display = 'none';
-    if (e.message && e.message.includes('Service returned')) {
-      errorEl.textContent = 'Search service error. Try entering lat/long coordinates directly (e.g. 36.02, -78.47).';
-    } else {
-      errorEl.textContent = 'Network error - check your connection. You can still click the map to set the LKP.';
-    }
+    errorEl.textContent = e.message && e.message.includes('http') ? 'Search service error. Try entering lat/long directly.' : 'Network error — check connection. You can still click the map to set the LKP.';
     errorEl.style.display = 'block';
   }
 }
@@ -396,8 +427,7 @@ function moveToLocation(latlng, name) {
 }
 
 function updateDisplayAndRings() {
-  document.getElementById('lkpDisplay').textContent =
-    'LKP: ' + currentLocationName + ' (' + currentLKP[0].toFixed(4) + ', ' + currentLKP[1].toFixed(4) + ')';
+  document.getElementById('lkpDisplay').textContent = 'LKP: ' + currentLocationName + ' (' + currentLKP[0].toFixed(4) + ', ' + currentLKP[1].toFixed(4) + ')';
   updateRings();
 }
 
@@ -405,8 +435,6 @@ function updateRings() {
   var type = document.getElementById('subjectType').value;
   var terrain = document.getElementById('terrain').value;
   var hours = parseInt(document.getElementById('hours').value) || 4;
-
-  // Skip full redraw if nothing that affects rings has changed
   var ringKey = type + '|' + terrain + '|' + hours + '|' + currentLKP[0].toFixed(5) + ',' + currentLKP[1].toFixed(5);
   if (ringKey === lastRingKey) return;
   lastRingKey = ringKey;
@@ -424,46 +452,52 @@ function updateRings() {
   for (var i = adjusted.length - 1; i >= 0; i--) {
     var c = L.circle(currentLKP, {
       radius: adjusted[i] * 1000,
-      color: data.colors[i],
-      fillColor: data.colors[i],
+      color: RING_COLORS[i],
+      fillColor: RING_COLORS[i],
       fillOpacity: 0,
-      weight: 2.5,
+      weight: RING_WIDTHS[i],
       dashArray: i === adjusted.length - 1 ? '8,5' : null
     }).addTo(map);
     c.bindTooltip('<strong>' + data.probs[i] + '% probability</strong><br>Within ' + adjusted[i] + ' km of LKP', { sticky:true });
     circles.push(c);
   }
 
-  var labels = ['Ring 1 - 25%','Ring 2 - 50%','Ring 3 - 75%','Ring 4 - 95%'];
-  document.getElementById('resultsGrid').innerHTML = adjusted.map(function(r,i) {
-    return '<div class="ring-card" style="border-left-color:' + data.colors[i] + '">' +
+  var labels = ['Ring 1 — 25%','Ring 2 — 50%','Ring 3 — 75%','Ring 4 — 95%'];
+  document.getElementById('resultsGrid').innerHTML = adjusted.map(function(r, i) {
+    return '<div class="ring-card" style="border-left-color:' + RING_COLORS[i] + '">' +
       '<div class="ring-label">' + labels[i] + '</div>' +
       '<div class="ring-dist">' + r + ' <span class="ring-unit">km</span></div>' +
-      '<div class="ring-prob">' + data.probs[i] + '% of subjects found within</div>' +
-      '</div>';
+      '<div class="ring-prob">' + data.probs[i] + '% of subjects found within</div></div>';
   }).join('');
 
-  document.getElementById('isridNote').innerHTML =
-    '<strong>ISRID - ' + data.label + ':</strong> ' + data.note + '<br><br><em>Terrain adjustment: ' + TERRAIN_LABELS[terrain] + '</em>';
+  document.getElementById('isridNote').innerHTML = '<strong>ISRID — ' + data.label + ':</strong> ' + data.note + '<br><br><em>Terrain adjustment: ' + TERRAIN_LABELS[terrain] + '</em>';
 
-  document.getElementById('behaviorPanel').innerHTML =
-    '<div class="behavior-title">Expected behaviors - ' + data.label + '</div>' +
-    data.behaviors.map(function(b) { return '- ' + b; }).join('<br>');
+  document.getElementById('behaviorPanel').innerHTML = '<div class="behavior-title">Expected behaviors — ' + data.label + '</div>' +
+    data.behaviors.map(function(b) { return '• ' + b; }).join('<br>');
 
-  document.getElementById('legendBox').innerHTML = adjusted.map(function(r,i) {
-    return '<div class="legend-item"><div class="legend-dot" style="background:' + data.colors[i] + '"></div>' +
-      data.probs[i] + '% - ' + r + ' km</div>';
+  document.getElementById('legendBox').innerHTML = adjusted.map(function(r, i) {
+    return '<div class="legend-item"><div class="legend-swatch" style="background:' + RING_COLORS[i] + ';height:' + (RING_WIDTHS[i]*2) + 'px"></div>' + data.probs[i] + '% &mdash; ' + r + ' km</div>';
   }).join('');
 }
 
+// ── Sector team inputs ────────────────────────────────────────
+function updateTeamInputs() {
+  var n = parseInt(document.getElementById('sectorCount').value);
+  var html = '';
+  for (var i = 0; i < n; i++) {
+    html += '<div class="team-input-wrap"><label>Sector ' + (i+1) + ' team</label>' +
+      '<input type="text" id="team_' + i + '" placeholder="e.g. Team Alpha"/></div>';
+  }
+  document.getElementById('teamInputs').innerHTML = html;
+}
+updateTeamInputs();
+
+// ── Circle coords (cached) ────────────────────────────────────
 function generateCircleCoords(lat, lng, radiusKm, points) {
-  var cacheKey = lat.toFixed(5) + ',' + lng.toFixed(5) + ',' + radiusKm;
-  if (coordCache[cacheKey]) return coordCache[cacheKey];
-  var coords = [];
-  var R = 6371;
-  var d = radiusKm / R;
-  var latR = lat * Math.PI / 180;
-  var lngR = lng * Math.PI / 180;
+  var key = lat.toFixed(5) + ',' + lng.toFixed(5) + ',' + radiusKm;
+  if (coordCache[key]) return coordCache[key];
+  var coords = [], R = 6371, d = radiusKm / R;
+  var latR = lat * Math.PI / 180, lngR = lng * Math.PI / 180;
   for (var i = 0; i <= points; i++) {
     var brng = (i * 360 / points) * Math.PI / 180;
     var pLat = Math.asin(Math.sin(latR)*Math.cos(d)+Math.cos(latR)*Math.sin(d)*Math.cos(brng));
@@ -471,68 +505,182 @@ function generateCircleCoords(lat, lng, radiusKm, points) {
     coords.push((pLng*180/Math.PI).toFixed(6) + ',' + (pLat*180/Math.PI).toFixed(6) + ',0');
   }
   var result = coords.join(' ');
-  coordCache[cacheKey] = result;
+  coordCache[key] = result;
   return result;
 }
 
+// Compute a single point on a circle at bearing brng (degrees) and radius
+function pointOnCircle(lat, lng, radiusKm, brngDeg) {
+  var R = 6371, d = radiusKm / R;
+  var latR = lat * Math.PI / 180, lngR = lng * Math.PI / 180;
+  var brng = brngDeg * Math.PI / 180;
+  var pLat = Math.asin(Math.sin(latR)*Math.cos(d)+Math.cos(latR)*Math.sin(d)*Math.cos(brng));
+  var pLng = lngR + Math.atan2(Math.sin(brng)*Math.sin(d)*Math.cos(latR), Math.cos(d)-Math.sin(latR)*Math.sin(pLat));
+  return [(pLng*180/Math.PI).toFixed(6) + ',' + (pLat*180/Math.PI).toFixed(6) + ',0', pLat*180/Math.PI, pLng*180/Math.PI];
+}
+
+// Build arc coords from startBrng to endBrng at given radius (72-point resolution)
+function arcCoords(lat, lng, radiusKm, startBrng, endBrng, points) {
+  var pts = points || 24;
+  var coords = [];
+  for (var i = 0; i <= pts; i++) {
+    var brng = startBrng + (endBrng - startBrng) * i / pts;
+    var r = pointOnCircle(lat, lng, radiusKm, brng);
+    coords.push(r[0]);
+  }
+  return coords;
+}
+
+// ── KML helpers ───────────────────────────────────────────────
+function kmlLineColor(hexRGB) { return 'ff' + hexRGB.slice(4,6) + hexRGB.slice(2,4) + hexRGB.slice(0,2); }
+
+function kmlRingPlacemark(name, desc, radiusKm, colorIdx, lat, lng) {
+  var coords = generateCircleCoords(lat, lng, radiusKm, 72);
+  var lc = kmlLineColor(RING_HEX[colorIdx]);
+  var width = RING_WIDTHS[colorIdx] + 1; // slightly thicker in export
+  return '\n  <Placemark>\n' +
+    '    <name>' + name + '</name>\n' +
+    '    <description>' + desc + '</description>\n' +
+    '    <Style>\n' +
+    '      <LineStyle><color>' + lc + '</color><width>' + width + '</width></LineStyle>\n' +
+    '      <PolyStyle><color>00000000</color><fill>0</fill></PolyStyle>\n' +
+    '    </Style>\n' +
+    '    <Polygon><outerBoundaryIs><LinearRing><coordinates>' + coords + '</coordinates></LinearRing></outerBoundaryIs></Polygon>\n' +
+    '  </Placemark>';
+}
+
+function kmlLKPPlacemark(lat, lng, data, terrain, hours, now) {
+  return '\n  <Placemark>\n' +
+    '    <name>LKP — Last Known Point</name>\n' +
+    '    <description>Subject: ' + data.label + ' | Location: ' + currentLocationName + ' | Terrain: ' + terrain + ' | Hours missing: ' + hours + ' | Date: ' + now + '</description>\n' +
+    '    <Style><IconStyle><color>ff0000ff</color><scale>1.4</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon></IconStyle></Style>\n' +
+    '    <Point><coordinates>' + lng.toFixed(6) + ',' + lat.toFixed(6) + ',0</coordinates></Point>\n' +
+    '  </Placemark>';
+}
+
+function kmlWrapper(name, desc, placemarks) {
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n' +
+    '  <name>' + name + '</name>\n  <description>' + desc + '</description>\n' +
+    placemarks + '\n</Document>\n</kml>';
+}
+
+// ── Standard KML export (all rings) ──────────────────────────
 function exportKML() {
   if (!lastData || lastAdjusted.length === 0) return;
-  var data = lastData;
-  var adjusted = lastAdjusted;
-  var lat = currentLKP[0];
-  var lng = currentLKP[1];
+  var data = lastData, adjusted = lastAdjusted;
+  var lat = currentLKP[0], lng = currentLKP[1];
   var type = document.getElementById('subjectType').value;
   var hours = document.getElementById('hours').value;
   var terrain = document.getElementById('terrain').value;
   var now = new Date().toISOString().split('T')[0];
   var ringNames = ['25% Probability Zone','50% Probability Zone','75% Probability Zone','95% Probability Zone (Outer Boundary)'];
 
-  var placemarks = '\n  <Placemark>\n' +
-    '    <name>LKP - Last Known Point</name>\n' +
-    '    <description>Subject: ' + data.label + ' | Location: ' + currentLocationName + ' | Terrain: ' + terrain + ' | Hours missing: ' + hours + ' | Date: ' + now + '</description>\n' +
-    '    <Style><IconStyle><color>ff0000ff</color><scale>1.2</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon></IconStyle></Style>\n' +
-    '    <Point><coordinates>' + lng.toFixed(6) + ',' + lat.toFixed(6) + ',0</coordinates></Point>\n' +
-    '  </Placemark>';
-
+  var placemarks = kmlLKPPlacemark(lat, lng, data, terrain, hours, now);
   adjusted.forEach(function(r, i) {
-    var coords = generateCircleCoords(lat, lng, r, 72);
-    var h = data.hex[i];
-    var lineColor = 'ff' + h.slice(4,6) + h.slice(2,4) + h.slice(0,2);
-    placemarks += '\n  <Placemark>\n' +
-      '    <name>' + ringNames[i] + ' - ' + r + ' km</name>\n' +
-      '    <description>ISRID ' + data.probs[i] + '% probability ring. ' + r + ' km radius. Subject: ' + data.label + '.</description>\n' +
-      '    <Style>\n' +
-      '      <LineStyle><color>' + lineColor + '</color><width>2</width></LineStyle>\n' +
-      '      <PolyStyle><color>00000000</color><fill>0</fill></PolyStyle>\n' +
-      '    </Style>\n' +
-      '    <Polygon><outerBoundaryIs><LinearRing><coordinates>' + coords + '</coordinates></LinearRing></outerBoundaryIs></Polygon>\n' +
-      '  </Placemark>';
+    placemarks += kmlRingPlacemark(ringNames[i] + ' — ' + r + ' km', 'ISRID ' + data.probs[i] + '% ring. ' + r + ' km radius. Subject: ' + data.label + '.', r, i, lat, lng);
   });
 
-  var kml = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-    '<kml xmlns="http://www.opengis.net/kml/2.2">\n' +
-    '<Document>\n' +
-    '  <name>SAR Probability Rings - ' + data.label + ' - ' + now + '</name>\n' +
-    '  <description>Generated by SAR Probability Ring Simulator. Subject: ' + data.label + '. Location: ' + currentLocationName + '. LKP: ' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '. Source: ISRID / Koester (2008).</description>\n' +
-    '  ' + placemarks + '\n' +
-    '</Document>\n</kml>';
-
-  downloadFile(kml, 'SAR_Rings_' + type + '_' + now + '.kml', 'application/vnd.google-earth.kml+xml');
+  downloadFile(kmlWrapper('SAR Rings — ' + data.label + ' — ' + now, 'Subject: ' + data.label + '. LKP: ' + currentLocationName + '. Source: ISRID / Koester (2008).', placemarks),
+    'SAR_Rings_' + type + '_' + now + '.kml', 'application/vnd.google-earth.kml+xml');
 }
 
+// ── Separate KML per ring ─────────────────────────────────────
+function exportKMLSeparate() {
+  if (!lastData || lastAdjusted.length === 0) return;
+  var data = lastData, adjusted = lastAdjusted;
+  var lat = currentLKP[0], lng = currentLKP[1];
+  var type = document.getElementById('subjectType').value;
+  var hours = document.getElementById('hours').value;
+  var terrain = document.getElementById('terrain').value;
+  var now = new Date().toISOString().split('T')[0];
+  var ringNames = ['25pct','50pct','75pct','95pct'];
+  var ringLabels = ['25% Probability Zone','50% Probability Zone','75% Probability Zone','95% Probability Zone'];
+
+  adjusted.forEach(function(r, i) {
+    var placemarks = kmlLKPPlacemark(lat, lng, data, terrain, hours, now);
+    placemarks += kmlRingPlacemark(ringLabels[i] + ' — ' + r + ' km', 'ISRID ' + data.probs[i] + '% ring. ' + r + ' km radius. Subject: ' + data.label + '.', r, i, lat, lng);
+    downloadFile(kmlWrapper('SAR ' + ringLabels[i] + ' — ' + data.label + ' — ' + now, 'Subject: ' + data.label + '. LKP: ' + currentLocationName + '.', placemarks),
+      'SAR_Ring_' + ringNames[i] + '_' + type + '_' + now + '.kml', 'application/vnd.google-earth.kml+xml');
+  });
+}
+
+// ── Sector / Assignment KML export ────────────────────────────
+function exportSectorKML() {
+  if (!lastData || lastAdjusted.length === 0) return;
+  var data = lastData, adjusted = lastAdjusted;
+  var lat = currentLKP[0], lng = currentLKP[1];
+  var type = document.getElementById('subjectType').value;
+  var hours = document.getElementById('hours').value;
+  var terrain = document.getElementById('terrain').value;
+  var now = new Date().toISOString().split('T')[0];
+  var n = parseInt(document.getElementById('sectorCount').value);
+  var offset = parseFloat(document.getElementById('sectorOffset').value) || 0;
+  var sectorAngle = 360 / n;
+
+  // Get team names
+  var teams = [];
+  for (var t = 0; t < n; t++) {
+    var el = document.getElementById('team_' + t);
+    teams.push(el && el.value.trim() ? el.value.trim() : 'Sector ' + (t+1));
+  }
+
+  var ringNames = ['25%','50%','75%','95%'];
+  var placemarks = kmlLKPPlacemark(lat, lng, data, terrain, hours, now);
+
+  // Add full rings (unfilled, for reference)
+  adjusted.forEach(function(r, i) {
+    placemarks += kmlRingPlacemark('Ring ' + (i+1) + ' — ' + ringNames[i] + ' (' + r + ' km)', 'Reference ring — ' + data.probs[i] + '% probability boundary.', r, i, lat, lng);
+  });
+
+  // Add sector polygons for each ring
+  adjusted.forEach(function(r, i) {
+    var lc = kmlLineColor(RING_HEX[i]);
+    var width = RING_WIDTHS[i] + 1;
+    var innerR = i > 0 ? adjusted[i-1] : 0;
+
+    for (var s = 0; s < n; s++) {
+      var startBrng = offset + s * sectorAngle;
+      var endBrng = offset + (s + 1) * sectorAngle;
+      var teamName = teams[s];
+
+      // Build sector polygon: outer arc + inner arc (reversed) + close
+      var outerArc = arcCoords(lat, lng, r, startBrng, endBrng, 16);
+      var coords;
+
+      if (innerR > 0) {
+        var innerArc = arcCoords(lat, lng, innerR, endBrng, startBrng, 16);
+        coords = outerArc.concat(innerArc);
+      } else {
+        // Goes to center for innermost ring
+        coords = outerArc.concat([lng.toFixed(6) + ',' + lat.toFixed(6) + ',0']);
+      }
+      coords.push(coords[0]); // close polygon
+
+      placemarks += '\n  <Placemark>\n' +
+        '    <name>' + teamName + ' — Ring ' + (i+1) + ' ' + ringNames[i] + '</name>\n' +
+        '    <description>Team: ' + teamName + ' | Ring ' + (i+1) + ' (' + data.probs[i] + '%) | Radius: ' + (innerR > 0 ? innerR + '–' : '0–') + r + ' km | Bearing: ' + startBrng.toFixed(0) + '–' + endBrng.toFixed(0) + '°</description>\n' +
+        '    <Style>\n' +
+        '      <LineStyle><color>' + lc + '</color><width>' + width + '</width></LineStyle>\n' +
+        '      <PolyStyle><color>1a' + RING_HEX[i].slice(4,6) + RING_HEX[i].slice(2,4) + RING_HEX[i].slice(0,2) + '</color><fill>1</fill></PolyStyle>\n' +
+        '    </Style>\n' +
+        '    <Polygon><outerBoundaryIs><LinearRing><coordinates>' + coords.join(' ') + '</coordinates></LinearRing></outerBoundaryIs></Polygon>\n' +
+        '  </Placemark>';
+    }
+  });
+
+  downloadFile(kmlWrapper('SAR Sectors — ' + data.label + ' — ' + now, 'Sector assignments. Subject: ' + data.label + '. LKP: ' + currentLocationName + '. ' + n + ' sectors.', placemarks),
+    'SAR_Sectors_' + type + '_' + now + '.kml', 'application/vnd.google-earth.kml+xml');
+}
+
+// ── GPX export ────────────────────────────────────────────────
 function exportGPX() {
   if (!lastData || lastAdjusted.length === 0) return;
-  var data = lastData;
-  var adjusted = lastAdjusted;
-  var lat = currentLKP[0];
-  var lng = currentLKP[1];
+  var data = lastData, adjusted = lastAdjusted;
+  var lat = currentLKP[0], lng = currentLKP[1];
   var type = document.getElementById('subjectType').value;
   var now = new Date().toISOString().split('T')[0];
 
-  var waypoints = '  <wpt lat="' + lat.toFixed(6) + '" lon="' + lng.toFixed(6) + '">\n' +
-    '    <name>LKP</name>\n' +
-    '    <desc>Last Known Point - ' + data.label + ' - ' + currentLocationName + '</desc>\n' +
-    '  </wpt>\n';
+  var waypoints = '  <wpt lat="' + lat.toFixed(6) + '" lon="' + lng.toFixed(6) + '">\n    <name>LKP</name>\n    <desc>Last Known Point — ' + data.label + ' — ' + currentLocationName + '</desc>\n  </wpt>\n';
 
   var tracks = adjusted.map(function(r, i) {
     var coords = generateCircleCoords(lat, lng, r, 72);
@@ -540,16 +688,10 @@ function exportGPX() {
       var parts = c.split(',');
       return '      <trkpt lat="' + parseFloat(parts[1]).toFixed(6) + '" lon="' + parseFloat(parts[0]).toFixed(6) + '"></trkpt>';
     }).join('\n');
-    return '  <trk>\n    <name>' + data.probs[i] + '% Ring - ' + r + 'km</name>\n    <trkseg>\n' + points + '\n    </trkseg>\n  </trk>';
+    return '  <trk>\n    <name>' + data.probs[i] + '% Ring — ' + r + 'km</name>\n    <trkseg>\n' + points + '\n    </trkseg>\n  </trk>';
   }).join('\n');
 
-  var gpx = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-    '<gpx version="1.1" creator="SAR Probability Ring Simulator" xmlns="http://www.topografix.com/GPX/1/1">\n' +
-    '  <metadata>\n' +
-    '    <name>SAR Rings - ' + data.label + ' - ' + now + '</name>\n' +
-    '    <desc>ISRID probability rings. Subject: ' + data.label + '. LKP: ' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '.</desc>\n' +
-    '  </metadata>\n' +
-    waypoints + tracks + '\n</gpx>';
+  var gpx = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="SAR Probability Ring Simulator" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata>\n    <name>SAR Rings — ' + data.label + ' — ' + now + '</name>\n    <desc>ISRID rings. Subject: ' + data.label + '. LKP: ' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '.</desc>\n  </metadata>\n' + waypoints + tracks + '\n</gpx>';
 
   downloadFile(gpx, 'SAR_Rings_' + type + '_' + now + '.gpx', 'application/gpx+xml');
 }
