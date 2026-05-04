@@ -183,6 +183,10 @@ let lastData = null;
 let autocompleteTimer = null;
 let autocompleteResults = [];
 let selectedIndex = -1;
+let currentAbortController = null;
+const searchCache = {};
+let coordCache = {};
+let lastRingKey = null;
 
 const tileLayers = {
   street:    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'OpenStreetMap contributors', maxZoom:19 }),
@@ -207,6 +211,7 @@ map.on('click', function(e) {
   lkpMarker.setLatLng(currentLKP);
   lkpMarker.setTooltipContent('<strong>LKP</strong><br>' + currentLocationName);
   closeAutocomplete();
+  coordCache = {};  // clear coord cache when LKP moves
   updateDisplayAndRings();
 });
 
@@ -262,15 +267,31 @@ function updateActiveItem(items) {
 }
 
 function fetchSuggestions(query) {
+  // Return cached result instantly if we have it
+  if (searchCache[query]) {
+    autocompleteResults = searchCache[query];
+    selectedIndex = -1;
+    renderSuggestions(searchCache[query]);
+    return;
+  }
+  // Cancel any previous in-flight request
+  if (currentAbortController) currentAbortController.abort();
+  currentAbortController = new AbortController();
   var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&limit=6&addressdetails=1';
-  fetch(url, { headers: { 'Accept-Language': 'en' } })
+  fetch(url, {
+    headers: { 'Accept-Language': 'en', 'User-Agent': 'SAR-Probability-Ring-Simulator/1.0' },
+    signal: currentAbortController.signal
+  })
     .then(function(res) { return res.json(); })
     .then(function(data) {
+      searchCache[query] = data;  // cache for next time
       autocompleteResults = data;
       selectedIndex = -1;
       renderSuggestions(data);
     })
-    .catch(function() { closeAutocomplete(); });
+    .catch(function(err) {
+      if (err.name !== 'AbortError') closeAutocomplete();
+    });
 }
 
 function renderSuggestions(results) {
@@ -327,20 +348,42 @@ async function searchLocation() {
     }
   }
 
+  // Check cache first
+  var cacheKey = 'exact:' + input.toLowerCase();
+  if (searchCache[cacheKey]) {
+    spinner.style.display = 'none';
+    var cached = searchCache[cacheKey];
+    currentLKP = [cached.lat, cached.lng];
+    currentLocationName = cached.name;
+    moveToLocation(currentLKP, currentLocationName);
+    return;
+  }
+
   try {
     var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(input) + '&limit=1';
-    var res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    var res = await fetch(url, { headers: { 'Accept-Language': 'en', 'User-Agent': 'SAR-Probability-Ring-Simulator/1.0' } });
+    if (!res.ok) throw new Error('Service returned ' + res.status);
     var data = await res.json();
     spinner.style.display = 'none';
     if (data && data.length > 0) {
-      currentLKP = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-      currentLocationName = data[0].display_name.split(',').slice(0,3).join(',');
+      var lat = parseFloat(data[0].lat);
+      var lng = parseFloat(data[0].lon);
+      var name = data[0].display_name.split(',').slice(0,3).join(',');
+      searchCache[cacheKey] = { lat: lat, lng: lng, name: name };
+      currentLKP = [lat, lng];
+      currentLocationName = name;
       moveToLocation(currentLKP, currentLocationName);
     } else {
+      errorEl.textContent = 'Location not found. Try a more specific address or enter lat/long directly.';
       errorEl.style.display = 'block';
     }
   } catch(e) {
     spinner.style.display = 'none';
+    if (e.message && e.message.includes('Service returned')) {
+      errorEl.textContent = 'Search service error. Try entering lat/long coordinates directly (e.g. 36.02, -78.47).';
+    } else {
+      errorEl.textContent = 'Network error - check your connection. You can still click the map to set the LKP.';
+    }
     errorEl.style.display = 'block';
   }
 }
@@ -362,6 +405,12 @@ function updateRings() {
   var type = document.getElementById('subjectType').value;
   var terrain = document.getElementById('terrain').value;
   var hours = parseInt(document.getElementById('hours').value) || 4;
+
+  // Skip full redraw if nothing that affects rings has changed
+  var ringKey = type + '|' + terrain + '|' + hours + '|' + currentLKP[0].toFixed(5) + ',' + currentLKP[1].toFixed(5);
+  if (ringKey === lastRingKey) return;
+  lastRingKey = ringKey;
+
   var data = ISRID[type];
   var multiplier = TERRAIN_MULTIPLIERS[terrain];
   var timeMultiplier = Math.min(1 + (hours - 4) * 0.05, 1.5);
@@ -408,6 +457,8 @@ function updateRings() {
 }
 
 function generateCircleCoords(lat, lng, radiusKm, points) {
+  var cacheKey = lat.toFixed(5) + ',' + lng.toFixed(5) + ',' + radiusKm;
+  if (coordCache[cacheKey]) return coordCache[cacheKey];
   var coords = [];
   var R = 6371;
   var d = radiusKm / R;
@@ -419,7 +470,9 @@ function generateCircleCoords(lat, lng, radiusKm, points) {
     var pLng = lngR + Math.atan2(Math.sin(brng)*Math.sin(d)*Math.cos(latR), Math.cos(d)-Math.sin(latR)*Math.sin(pLat));
     coords.push((pLng*180/Math.PI).toFixed(6) + ',' + (pLat*180/Math.PI).toFixed(6) + ',0');
   }
-  return coords.join(' ');
+  var result = coords.join(' ');
+  coordCache[cacheKey] = result;
+  return result;
 }
 
 function exportKML() {
