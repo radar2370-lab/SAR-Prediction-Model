@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SAR Probability Ring Simulator V.1.2.0</title>
+  <title>SAR Probability Ring Simulator V.1.2.1</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -72,8 +72,8 @@
   </header>
 
   <div class="card">
-    <div class="card-title">Last known point (LKP) location</div>
-    <div class="location-hint">Start typing an address or place name — suggestions will appear. You can also enter lat/long or click the map.</div>
+    <div class="card-title">Last Known Point (LKP) location</div>
+    <div class="location-hint">Start typing an address or place name — suggestions will appear. You can also enter degrees - Lat/Long or click the map.</div>
     <div class="location-row">
       <div class="location-input-wrap">
         <input type="text" id="locationInput" placeholder="e.g. 123 Main St, Asheville NC" autocomplete="off" value="Youngsville, NC"/>
@@ -129,14 +129,14 @@
         </select>
       </div>
       <div class="field">
-        <label>Hours missing</label>
+        <label>Hours missing (<1hr = 1)</label>
         <input type="number" id="hours" value="4" min="1" max="72" oninput="debouncedUpdate()"/>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Map — click to adjust LKP or use the search above</div>
+    <div class="card-title">Map — click to adjust LKP or use the search above.</div>
     <div class="map-hint">You can also click directly on the map to move the LKP</div>
     <div id="map"></div>
     <div class="basemap-btns">
