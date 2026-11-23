@@ -75,4 +75,9 @@ ISRID contains data from over 150,000 search and rescue incidents worldwide and 
 
 ## Disclaimer
 
-This tool is in active development and is provided as-is. It is **not a substitute for professional SAR training, ICS protocols, or qualified incident command decisions.** Ring distances are statistical estimates based on historical data and may not reflect conditions of any specific incident.
+This tool is in active development and is provided as-is. It is **not a substitute for professional SAR training, ICS protocols, or qualified incident command decisions.** Ring distances are statistical estimates based on historical data and may not reflect conditions of any specific incident. 
+
+---
+## AI Disclaimer 
+
+A portion of this project utilized Claude AI in order to program the HTML script. AI was not utilized in the data cumulation or interpretation of. *The parameters were set in order for the datasets to be translated into HTML Format.*
